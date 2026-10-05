@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>X2 排水法虚拟实验</title>
+<style>
+  body { margin: 0; overflow: hidden; font-family: "Microsoft YaHei", sans-serif; background: #1a1a2e; color: white; }
+
+  #title {
+    position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
+    font-size: 18px; color: #66ccff;
+    background: rgba(0,0,0,0.72);
+    padding: 8px 24px; border-radius: 20px;
+    font-weight: bold; letter-spacing: 2px;
+  }
+
+  #info {
+    position: absolute; top: 78px; left: 20px;
+    background: rgba(0,0,0,0.82);
+    padding: 15px 22px; border-radius: 10px;
+    font-size: 14px; line-height: 2; min-width: 280px;
+  }
+  #info h3 { margin: 0 0 10px; color: #66ccff; font-size: 16px; }
+  .row-info { display: flex; justify-content: space-between; gap: 16px; padding: 1px 0; }
+  .row-info span:first-child { color: #aaa; }
+  .row-info .val { color: #88ffbb; font-weight: bold; }
+  .row-info .key { color: #ffcc00; font-weight: bold; font-size: 16px; }
+
+  #result {
+    position: absolute; top: 78px; right: 20px;
+    background: rgba(0,0,0,0.82);
+    padding: 18px 24px; border-radius: 10px;
+    min-width: 300px;
+  }
+  #result h3 { margin: 0 0 12px; color: #ffcc00; font-size: 16px; }
+  #result .formula-line {
+    font-size: 15px; line-height: 2.1; color: #eee;
+    display: flex; justify-content: space-between;
+  }
+  #result .formula-line.highlight {
+    color: #ffcc00; font-weight: bold;
+    border-top: 1px solid #555;
+    padding-top: 8px; margin-top: 6px;
+  }
+  #result .formula-line .num {
+    color: #88ffbb; font-weight: bold;
+  }
+  #result .formula-line.highlight .num {
+    color: #ffcc00; font-size: 17px;
+  }
+
+  #hint {
+    position: absolute; bottom: 170px; right: 20px;
+    background: rgba(0,0,0,0.72);
+    padding: 12px 18px; border-radius: 8px;
+    font-size: 13px; line-height: 1.8; color: #aaccff;
+    max-width: 260px;
+  }
+  #hint strong { color: #ffcc00; }
+
+  #controls {
+    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.9); padding: 18px 26px; border-radius: 12px;
+    display: flex; flex-direction: column; gap: 12px; min-width: 640px;
+  }
+  .row { display: flex; gap: 14px; align-items: center; }
+  .row label { font-size: 15px; color: #ccc; white-space: nowrap; }
+  #tSlider { flex: 1; height: 6px; cursor: pointer; }
+  #tValue { color: #ffcc00; font-weight: bold; font-size: 16px; min-width: 55px; text-align: right; }
+  #btnRow button {
+    padding: 9px 22px; font-size: 14px;
+    border: none; border-radius: 6px; cursor: pointer;
+    background: #4488ff; color: white; font-weight: bold; font-family: inherit;
+  }
+  #btnRow button:hover { background: #3366cc; }
+  #btnIn { background: #22aa66; } #btnIn:hover { background: #118855; }
+  #btnOut { background: #cc7744; } #btnOut:hover { background: #aa5522; }
+</style>
+</head>
+<body>
+
+<div id="title">X2 排水法虚拟实验</div>
+
+<div id="info">
+  <h3>实验参数</h3>
+  <div class="row-info"><span>量筒底半径 R</span><span class="val" id="infoR">0.750</span></div>
+  <div class="row-info"><span>量筒底面积 S = πR²</span><span class="val" id="infoS">1.767</span></div>
+  <div class="row-info"><span>初始水位 h₀</span><span class="val" id="infoH0">1.100</span></div>
+  <div class="row-info"><span>当前水位 h₁</span><span class="key" id="infoH1">1.100</span></div>
+  <div class="row-info"><span>液面差 Δh</span><span class="key" id="infoDeltaH">0.000</span></div>
+</div>
+
+<div id="result">
+  <h3>🧪 排水法原理</h3>
+  <div class="formula-line">
+    <span>V石 = S × Δh</span>
+  </div>
+  <div class="formula-line">
+    <span>S = πR²</span>
+    <span class="num" id="calS">1.767</span>
+  </div>
+  <div class="formula-line">
+    <span>Δh = h₁ − h₀</span>
+    <span class="num" id="calDh">0.000</span>
+  </div>
+  <div class="formula-line highlight">
+    <span>V石 =</span>
+    <span class="num" id="calV">0.000</span>
+  </div>
+</div>
+
+<div id="hint">
+  💡 <strong>玩法</strong><br>
+  拖动下方滑块，让石块慢慢沉入水中。<br><br>
+  观察三件事：<br>
+  1️⃣ 液面随石块下沉而上升<br>
+  2️⃣ 完全浸没后液面不再变化<br>
+  3️⃣ <strong>V石 = 底面积 × 液面差</strong>
+</div>
+
+<div id="controls">
+  <div class="row">
+    <label>石块下沉程度</label>
+    <input type="range" id="tSlider" min="0" max="100" value="0" step="1">
+    <span id="tValue">0%</span>
+  </div>
+  <div class="row" id="btnRow" style="justify-content:center;">
+    <button id="btnIn">缓放入水</button>
+    <button id="btnOut">缓缓取出</button>
+    <button id="btnReset">重置视角</button>
+  </div>
+</div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.186.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.186.0/examples/jsm/"
+  }
+}
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+/* ============ 参数 ============ */
+const CYL_R = 0.75;               // 量筒底半径
+const CYL_H = 3.0;                // 量筒高
+const WATER_H0 = 1.10;            // 初始水位
+const STONE_V = 0.55;             // 石块体积
+const STONE_R = 0.55;             // 石块视觉半径
+const S_BASE = Math.PI * CYL_R * CYL_R;  // 底面积
+
+let t = 0;                        // 0 = 石块在上方，1 = 完全沉底
+let targetT = 0;
+let autoMode = 0;                 // 0 = 无，1 = 自动入水，-1 = 自动出水
+
+/* ============ 场景 ============ */
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x1a1a2e);
+
+const camera = new THREE.PerspectiveCamera(50, innerWidth / innerHeight, 0.1, 1000);
+camera.position.set(3.5, 2.5, 4.5);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(devicePixelRatio);
+document.body.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.target.set(0, 1.2, 0);
+
+/* ============ 光照 ============ */
+scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+const dl1 = new THREE.DirectionalLight(0xffffff, 1.1);
+dl1.position.set(5, 8, 7); scene.add(dl1);
+const dl2 = new THREE.DirectionalLight(0x88aaff, 0.6);
+dl2.position.set(-5, 3, -7); scene.add(dl2);
+const dl3 = new THREE.DirectionalLight(0xffffff, 0.5);
+dl3.position.set(0, -5, 0); scene.add(dl3);
+
+/* ============ 地面网格 ============ */
+const grid = new THREE.GridHelper(12, 24, 0x444466, 0x2a2a44);
+grid.position.y = -0.02;
+scene.add(grid);
+
+/* ============ 工具：水平圆环 ============ */
+function makeCircleLine(radius, y, color, opacity = 0.6, segments = 96) {
+  const pts = [];
+  for (let i = 0; i <= segments; i++) {
+    const a = (i / segments) * Math.PI * 2;
+    pts.push(new THREE.Vector3(radius * Math.cos(a), y, radius * Math.sin(a)));
+  }
+  return new THREE.Line(
+    new THREE.BufferGeometry().setFromPoints(pts),
+    new THREE.LineBasicMaterial({ color, transparent: true, opacity })
+  );
+}
+
+/* ============ 量筒 ============ */
+/* 外壁 */
+const tubeMat = new THREE.MeshStandardMaterial({
+  color: 0x88ccff, side: THREE.DoubleSide,
+  transparent: true, opacity: 0.08,
+  roughness: 0.1, metalness: 0.05,
+  depthWrite: false,
+});
+const tube = new THREE.Mesh(
+  new THREE.CylinderGeometry(CYL_R, CYL_R, CYL_H, 64, 1, true),
+  tubeMat
+);
+tube.position.y = CYL_H / 2;
+scene.add(tube);
+
+/* 上下边缘 */
+scene.add(makeCircleLine(CYL_R, 0, 0x88ccff, 0.65));
+scene.add(makeCircleLine(CYL_R, CYL_H, 0x88ccff, 0.65));
+
+/* 底部圆盘 */
+const bottomDisc = new THREE.Mesh(
+  new THREE.CircleGeometry(CYL_R, 64),
+  new THREE.MeshStandardMaterial({
+    color: 0x88ccff, side: THREE.DoubleSide,
+    transparent: true, opacity: 0.15,
+    depthWrite: false,
+  })
+);
+bottomDisc.rotation.x = -Math.PI / 2;
+bottomDisc.position.y = 0.001;
+scene.add(bottomDisc);
+
+/* 刻度线：每 0.5 一条，整数位亮一些 */
+for (let y = 0.5; y <= CYL_H - 0.05; y += 0.5) {
+  const isMajor = Math.abs(y - Math.round(y)) < 0.01;
+  const color = isMajor ? 0x88ccff : 0x445577;
+  const op = isMajor ? 0.45 : 0.22;
+  scene.add(makeCircleLine(CYL_R + 0.005, y, color, op, 96));
+}
+
+/* ============ 水 ============ */
+const waterMat = new THREE.MeshStandardMaterial({
+  color: 0x3399dd, side: THREE.DoubleSide,
+  transparent: true, opacity: 0.5,
+  roughness: 0.15, metalness: 0.1,
+  emissive: 0x113355, emissiveIntensity: 0.2,
+  depthWrite: false,
+});
+const water = new THREE.Mesh(
+  new THREE.CylinderGeometry(CYL_R * 0.985, CYL_R * 0.985, 1, 64),
+  waterMat
+);
+scene.add(water);
+
+/* 水面高光圆盘 */
+const waterSurface = new THREE.Mesh(
+  new THREE.CircleGeometry(CYL_R * 0.985, 64),
+  new THREE.MeshStandardMaterial({
+    color: 0x66bbee, side: THREE.DoubleSide,
+    transparent: true, opacity: 0.72,
+    roughness: 0.1, metalness: 0.15,
+    depthWrite: false,
+  })
+);
+waterSurface.rotation.x = -Math.PI / 2;
+scene.add(waterSurface);
+
+/* ============ 石块（不规则多面体） ============ */
+const stoneGeo = new THREE.IcosahedronGeometry(STONE_R, 1);
+/* 打乱顶点位置，形成不规则形状 */
+const stonePos = stoneGeo.attributes.position;
+const randCache = [];
+for (let i = 0; i < stonePos.count; i++) {
+  if (randCache[i] === undefined) randCache[i] = 0.82 + Math.random() * 0.32;
+}
+for (let i = 0; i < stonePos.count; i++) {
+  stonePos.setXYZ(
+    i,
+    stonePos.getX(i) * randCache[i],
+    stonePos.getY(i) * randCache[i],
+    stonePos.getZ(i) * randCache[i]
+  );
+}
+stoneGeo.computeVertexNormals();
+
+const stone = new THREE.Mesh(stoneGeo, new THREE.MeshStandardMaterial({
+  color: 0x8b6f4e,
+  roughness: 0.88, metalness: 0.08,
+  flatShading: true,
+  emissive: 0x2a1f10, emissiveIntensity: 0.15,
+}));
+scene.add(stone);
+
+/* 石块轮廓线 */
+const stoneEdge = new THREE.LineSegments(
+  new THREE.EdgesGeometry(stoneGeo, 15),
+  new THREE.LineBasicMaterial({ color: 0x3a2a18, transparent: true, opacity: 0.55 })
+);
+stone.add(stoneEdge);
+
+/* ============ 平滑函数 ============ */
+function smoothstep(x) {
+  x = Math.max(0, Math.min(1, x));
+  return x * x * (3 - 2 * x);
+}
+
+/* ============ 计算排水量 ============ */
+function computeDisp(t) {
+  /* t < 0.55: 石块在水面上方，未接触水面
+     t > 0.87: 石块完全浸没，排水量 = 石块体积
+     中间平滑过渡 */
+  const ratio = smoothstep((t - 0.55) / 0.32);
+  return STONE_V * ratio;
+}
+
+/* ============ 更新状态 ============ */
+function update() {
+  /* 石块中心高度：从 3.0 降到 0.55 */
+  const yStone = 3.0 - 2.45 * t;
+  stone.position.set(0, yStone, 0);
+  stone.rotation.y = t * Math.PI * 0.8;
+  stone.rotation.x = t * Math.PI * 0.3;
+
+  /* 排水体积 → 水位 */
+  const vDisp = computeDisp(t);
+  const waterLevel = WATER_H0 + vDisp / S_BASE;
+
+  /* 更新水网格 */
+  water.scale.y = waterLevel;
+  water.position.y = waterLevel / 2;
+  waterSurface.position.y = waterLevel + 0.003;
+
+  /* 更新数据面板 */
+  const dh = waterLevel - WATER_H0;
+  document.getElementById('infoH1').textContent = waterLevel.toFixed(3);
+  document.getElementById('infoDeltaH').textContent = dh.toFixed(3);
+  document.getElementById('calDh').textContent = dh.toFixed(3);
+  document.getElementById('calV').textContent = (S_BASE * dh).toFixed(4);
+  document.getElementById('tValue').textContent = Math.round(t * 100) + '%';
+}
+
+/* ============ 初始化静态数据 ============ */
+document.getElementById('infoR').textContent = CYL_R.toFixed(3);
+document.getElementById('infoS').textContent = S_BASE.toFixed(3);
+document.getElementById('infoH0').textContent = WATER_H0.toFixed(3);
+document.getElementById('calS').textContent = S_BASE.toFixed(4);
+
+/* ============ UI 事件 ============ */
+const tSlider = document.getElementById('tSlider');
+
+tSlider.addEventListener('input', () => {
+  t = parseFloat(tSlider.value) / 100;
+  targetT = t;
+  autoMode = 0;
+  update();
+});
+
+document.getElementById('btnIn').onclick = () => {
+  autoMode = 1;
+  targetT = 1;
+};
+
+document.getElementById('btnOut').onclick = () => {
+  autoMode = -1;
+  targetT = 0;
+};
+
+document.getElementById('btnReset').onclick = () => {
+  camera.position.set(3.5, 2.5, 4.5);
+  controls.target.set(0, 1.2, 0);
+  controls.update();
+};
+
+/* ============ 动画循环 ============ */
+function animate() {
+  requestAnimationFrame(animate);
+
+  /* 自动入水/出水 */
+  if (autoMode !== 0) {
+    const speed = 0.008;
+    t += (targetT - t) * speed * 10;
+    if (Math.abs(targetT - t) < 0.002) {
+      t = targetT;
+      autoMode = 0;
+    }
+    tSlider.value = t * 100;
+    update();
+  }
+
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+/* ============ 启动 ============ */
+update();
+animate();
+
+addEventListener('resize', () => {
+  camera.aspect = innerWidth / innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+</script>
+</body>
+</html>
