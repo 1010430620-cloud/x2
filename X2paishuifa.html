@@ -7,74 +7,80 @@
   body { margin: 0; overflow: hidden; font-family: "Microsoft YaHei", sans-serif; background: #1a1a2e; color: white; }
 
   #title {
-    position: absolute; top: 18px; left: 50%; transform: translateX(-50%);
-    font-size: 18px; color: #66ccff;
-    background: rgba(0,0,0,0.72);
-    padding: 8px 24px; border-radius: 20px;
-    font-weight: bold; letter-spacing: 2px;
+    position: absolute; top: 8px; left: 50%; transform: translateX(-50%);
+    font-size: 13px; color: #66ccff;
+    background: rgba(0,0,0,0.7);
+    padding: 4px 14px; border-radius: 12px;
+    font-weight: bold; letter-spacing: 1px;
+    pointer-events: none;
   }
 
   #info {
-    position: absolute; top: 78px; left: 20px;
-    background: rgba(0,0,0,0.82);
-    padding: 15px 22px; border-radius: 10px;
-    font-size: 14px; line-height: 2; min-width: 280px;
+    position: absolute; top: 40px; left: 8px;
+    background: rgba(0,0,0,0.75);
+    padding: 6px 10px; border-radius: 6px;
+    font-size: 11px; line-height: 1.55; min-width: 185px;
+    pointer-events: none;
   }
-  #info h3 { margin: 0 0 10px; color: #66ccff; font-size: 16px; }
-  .row-info { display: flex; justify-content: space-between; gap: 16px; padding: 1px 0; }
+  #info h3 { margin: 0 0 5px; color: #66ccff; font-size: 12px; }
+  .row-info { display: flex; justify-content: space-between; gap: 8px; padding: 0; }
   .row-info span:first-child { color: #aaa; }
   .row-info .val { color: #88ffbb; font-weight: bold; }
-  .row-info .key { color: #ffcc00; font-weight: bold; font-size: 16px; }
+  .row-info .key { color: #ffcc00; font-weight: bold; font-size: 12px; }
 
   #result {
-    position: absolute; top: 78px; right: 20px;
-    background: rgba(0,0,0,0.82);
-    padding: 18px 24px; border-radius: 10px;
-    min-width: 300px;
+    position: absolute; top: 40px; right: 8px;
+    background: rgba(0,0,0,0.75);
+    padding: 7px 11px; border-radius: 6px;
+    min-width: 180px;
+    pointer-events: none;
   }
-  #result h3 { margin: 0 0 12px; color: #ffcc00; font-size: 16px; }
+  #result h3 { margin: 0 0 6px; color: #ffcc00; font-size: 12px; }
   #result .formula-line {
-    font-size: 15px; line-height: 2.1; color: #eee;
-    display: flex; justify-content: space-between;
+    font-size: 11px; line-height: 1.7; color: #eee;
+    display: flex; justify-content: space-between; gap: 10px;
   }
   #result .formula-line.highlight {
     color: #ffcc00; font-weight: bold;
     border-top: 1px solid #555;
-    padding-top: 8px; margin-top: 6px;
+    padding-top: 4px; margin-top: 4px;
   }
   #result .formula-line .num {
     color: #88ffbb; font-weight: bold;
   }
   #result .formula-line.highlight .num {
-    color: #ffcc00; font-size: 17px;
+    color: #ffcc00; font-size: 12px;
   }
 
   #hint {
-    position: absolute; bottom: 170px; right: 20px;
-    background: rgba(0,0,0,0.72);
-    padding: 12px 18px; border-radius: 8px;
-    font-size: 13px; line-height: 1.8; color: #aaccff;
-    max-width: 260px;
+    position: absolute; bottom: 76px; right: 8px;
+    background: rgba(0,0,0,0.62);
+    padding: 5px 9px; border-radius: 6px;
+    font-size: 10px; line-height: 1.55; color: #aaccff;
+    max-width: 180px;
+    pointer-events: none;
   }
   #hint strong { color: #ffcc00; }
 
   #controls {
-    position: absolute; bottom: 24px; left: 50%; transform: translateX(-50%);
-    background: rgba(0,0,0,0.9); padding: 18px 26px; border-radius: 12px;
-    display: flex; flex-direction: column; gap: 12px; min-width: 640px;
+    position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.85); padding: 8px 12px; border-radius: 8px;
+    display: flex; flex-direction: column; gap: 6px;
+    max-width: calc(100vw - 20px);
   }
-  .row { display: flex; gap: 14px; align-items: center; }
-  .row label { font-size: 15px; color: #ccc; white-space: nowrap; }
-  #tSlider { flex: 1; height: 6px; cursor: pointer; }
-  #tValue { color: #ffcc00; font-weight: bold; font-size: 16px; min-width: 55px; text-align: right; }
+  .row { display: flex; gap: 8px; align-items: center; justify-content: center; }
+  .row label { font-size: 11px; color: #ccc; white-space: nowrap; }
+  #tSlider { flex: 1; height: 4px; cursor: pointer; min-width: 160px; }
+  #tValue { color: #ffcc00; font-weight: bold; font-size: 11px; min-width: 34px; text-align: right; }
+  #btnRow { display: flex; gap: 5px; justify-content: center; }
   #btnRow button {
-    padding: 9px 22px; font-size: 14px;
-    border: none; border-radius: 6px; cursor: pointer;
+    padding: 3px 10px; font-size: 11px;
+    border: none; border-radius: 4px; cursor: pointer;
     background: #4488ff; color: white; font-weight: bold; font-family: inherit;
   }
   #btnRow button:hover { background: #3366cc; }
-  #btnIn { background: #22aa66; } #btnIn:hover { background: #118855; }
-  #btnOut { background: #cc7744; } #btnOut:hover { background: #aa5522; }
+  #btnIn { background: #22aa66 !important; } #btnIn:hover { background: #118855 !important; }
+  #btnOut { background: #cc7744 !important; } #btnOut:hover { background: #aa5522 !important; }
 </style>
 </head>
 <body>
